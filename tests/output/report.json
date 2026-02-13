@@ -1,0 +1,1519 @@
+{
+  "meta": {
+    "tool": "Kryptonite",
+    "version": "1.0.0",
+    "scan_date": "2026-02-13T19:49:34.331948+00:00"
+  },
+  "app_info": {
+    "bundle_name": "InsecureTestApp",
+    "bundle_id": "com.example.insecure-app",
+    "bundle_version": "2.1.0",
+    "min_os_version": "14.0",
+    "ipa_file": "test_app.ipa",
+    "total_files": "5"
+  },
+  "summary": {
+    "total_findings": 47,
+    "severity_breakdown": {
+      "Critical": 5,
+      "High": 9,
+      "Medium": 27,
+      "Info": 1,
+      "Low": 5
+    },
+    "risk_score": 100,
+    "risk_label": "Critical"
+  },
+  "owasp_mapping": [
+    {
+      "code": "M1",
+      "title": "Improper Credential Usage",
+      "description": "Hardcoded credentials, insecure credential storage, or improper use of biometric APIs.",
+      "finding_count": 7,
+      "findings": [
+        {
+          "id": "SEC-001",
+          "title": "AWS Access Key ID (in binary)",
+          "description": "A potential aws access key id was found embedded in the application binary.",
+          "severity": "Critical",
+          "owasp_category": "M1",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 1,
+              "snippet": "AKIAIOSFODNN7EXAMPLE"
+            }
+          ],
+          "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+        },
+        {
+          "id": "SEC-011",
+          "title": "GitHub / GitLab Token (in binary)",
+          "description": "A potential github / gitlab token was found embedded in the application binary.",
+          "severity": "Critical",
+          "owasp_category": "M1",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 13,
+              "snippet": "ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef1234"
+            }
+          ],
+          "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+        },
+        {
+          "id": "SEC-006",
+          "title": "Private Key Block (in binary)",
+          "description": "A potential private key block was found embedded in the application binary.",
+          "severity": "Critical",
+          "owasp_category": "M1",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 14,
+              "snippet": "-----BEGIN RSA PRIVATE KEY-----"
+            }
+          ],
+          "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+        },
+        {
+          "id": "SEC-009",
+          "title": "Database Connection String (in binary)",
+          "description": "A potential database connection string was found embedded in the application binary.",
+          "severity": "Critical",
+          "owasp_category": "M1",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 15,
+              "snippet": "mongodb://admin:pw@prod.db.co:27017/db"
+            }
+          ],
+          "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+        },
+        {
+          "id": "SEC-008",
+          "title": "Bearer Token (in binary)",
+          "description": "A potential bearer token was found embedded in the application binary.",
+          "severity": "High",
+          "owasp_category": "M1",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 16,
+              "snippet": "Bearer eyJhbGciOiJIUzI1NiJ9.abcdefghijklmnop1234"
+            }
+          ],
+          "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+        },
+        {
+          "id": "SEC-005",
+          "title": "Generic API Key / Token (in binary)",
+          "description": "A potential generic api key / token was found embedded in the application binary.",
+          "severity": "High",
+          "owasp_category": "M1",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 17,
+              "snippet": "api_key = \"sk-proj-abc123456789012345678901234567890\""
+            }
+          ],
+          "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+        },
+        {
+          "id": "SEC-007",
+          "title": "Hardcoded Password (in binary)",
+          "description": "A potential hardcoded password was found embedded in the application binary.",
+          "severity": "High",
+          "owasp_category": "M1",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 18,
+              "snippet": "password = \"SuperSecret123!\""
+            }
+          ],
+          "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+        }
+      ]
+    },
+    {
+      "code": "M2",
+      "title": "Inadequate Supply Chain Security",
+      "description": "Third-party libraries with known vulnerabilities, unsigned code, or unverified SDKs.",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "code": "M3",
+      "title": "Insecure Authentication/Authorization",
+      "description": "Weak authentication mechanisms, missing session management, or insecure deep-link handling.",
+      "finding_count": 6,
+      "findings": [
+        {
+          "id": "URL-001",
+          "title": "Custom URL Scheme: insecureapp://",
+          "description": "The app registers a custom URL scheme 'insecureapp://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+          "severity": "Medium",
+          "owasp_category": "M3",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "CFBundleURLSchemes = [insecureapp], Name = d"
+            }
+          ],
+          "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+        },
+        {
+          "id": "URL-001",
+          "title": "Custom URL Scheme: myapp-debug://",
+          "description": "The app registers a custom URL scheme 'myapp-debug://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+          "severity": "Medium",
+          "owasp_category": "M3",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "CFBundleURLSchemes = [myapp-debug], Name = d"
+            }
+          ],
+          "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+        },
+        {
+          "id": "URL-001",
+          "title": "Custom URL Scheme: insecureapp-oauth://",
+          "description": "The app registers a custom URL scheme 'insecureapp-oauth://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+          "severity": "Medium",
+          "owasp_category": "M3",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "CFBundleURLSchemes = [insecureapp-oauth], Name = o"
+            }
+          ],
+          "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+        },
+        {
+          "id": "URL-001",
+          "title": "Custom URL Scheme: myapp-callback://",
+          "description": "The app registers a custom URL scheme 'myapp-callback://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+          "severity": "Medium",
+          "owasp_category": "M3",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "CFBundleURLSchemes = [myapp-callback], Name = o"
+            }
+          ],
+          "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+        },
+        {
+          "id": "URL-002",
+          "title": "Excessive URL Schemes Registered",
+          "description": "The app registers 4 custom URL schemes: insecureapp, myapp-debug, insecureapp-oauth, myapp-callback. Each scheme expands the app's attack surface.",
+          "severity": "Medium",
+          "owasp_category": "M3",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "4 custom URL schemes"
+            }
+          ],
+          "remediation": "Minimize the number of URL schemes. Prefer Universal Links."
+        },
+        {
+          "id": "URL-003",
+          "title": "No Universal Links Configured",
+          "description": "The app uses custom URL schemes but does not configure Universal Links (Associated Domains with applinks:). Universal Links provide cryptographic origin verification that custom URL schemes lack.",
+          "severity": "Low",
+          "owasp_category": "M3",
+          "evidence": [
+            {
+              "file": "Entitlements",
+              "line": null,
+              "snippet": "No applinks: entries in associated-domains"
+            }
+          ],
+          "remediation": "Implement Universal Links via Associated Domains. See Apple's documentation on Supporting Universal Links."
+        }
+      ]
+    },
+    {
+      "code": "M4",
+      "title": "Insufficient Input/Output Validation",
+      "description": "SQL injection, XSS, path traversal, or other injection attacks via unvalidated input.",
+      "finding_count": 0,
+      "findings": []
+    },
+    {
+      "code": "M5",
+      "title": "Insecure Communication",
+      "description": "Cleartext traffic, disabled certificate pinning, or weak TLS configurations.",
+      "finding_count": 6,
+      "findings": [
+        {
+          "id": "TRANS-001",
+          "title": "App Transport Security Disabled Globally",
+          "description": "NSAllowsArbitraryLoads is set to YES, which disables App Transport Security for all network connections. This allows the app to make insecure HTTP connections.",
+          "severity": "High",
+          "owasp_category": "M5",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSAllowsArbitraryLoads = true"
+            }
+          ],
+          "remediation": "Set NSAllowsArbitraryLoads to NO and configure per-domain exceptions only for domains that truly require HTTP. Use HTTPS everywhere."
+        },
+        {
+          "id": "TRANS-002",
+          "title": "Arbitrary Loads Allowed in Web Content",
+          "description": "NSAllowsArbitraryLoadsInWebContent is enabled, allowing insecure loads within WebViews.",
+          "severity": "Medium",
+          "owasp_category": "M5",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSAllowsArbitraryLoadsInWebContent = true"
+            }
+          ],
+          "remediation": "Disable this flag and ensure all web content is served over HTTPS."
+        },
+        {
+          "id": "TRANS-003",
+          "title": "Insecure HTTP Allowed for legacy-api.example.com",
+          "description": "The domain 'legacy-api.example.com' has NSExceptionAllowsInsecureHTTPLoads enabled, allowing plaintext HTTP connections.",
+          "severity": "Medium",
+          "owasp_category": "M5",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "legacy-api.example.com: NSExceptionAllowsInsecureHTTPLoads = true"
+            }
+          ],
+          "remediation": "Migrate legacy-api.example.com to HTTPS and remove this exception."
+        },
+        {
+          "id": "TRANS-004",
+          "title": "Weak TLS Version for legacy-api.example.com",
+          "description": "Domain 'legacy-api.example.com' allows TLSv1.0, which is deprecated and vulnerable.",
+          "severity": "High",
+          "owasp_category": "M5",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "legacy-api.example.com: NSExceptionMinimumTLSVersion = TLSv1.0"
+            }
+          ],
+          "remediation": "Require TLS 1.2 or higher for legacy-api.example.com."
+        },
+        {
+          "id": "TRANS-005",
+          "title": "Hardcoded HTTP URL",
+          "description": "A plaintext HTTP URL (http://api.insecure.com) was found in the binary. Data transmitted over HTTP is susceptible to interception.",
+          "severity": "Medium",
+          "owasp_category": "M5",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 6,
+              "snippet": "http://api.insecure.com"
+            }
+          ],
+          "remediation": "Replace all HTTP URLs with HTTPS equivalents."
+        },
+        {
+          "id": "TRANS-005",
+          "title": "Hardcoded HTTP URL",
+          "description": "A plaintext HTTP URL (http://tracking.example.net) was found in the binary. Data transmitted over HTTP is susceptible to interception.",
+          "severity": "Medium",
+          "owasp_category": "M5",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 20,
+              "snippet": "http://tracking.example.net"
+            }
+          ],
+          "remediation": "Replace all HTTP URLs with HTTPS equivalents."
+        }
+      ]
+    },
+    {
+      "code": "M6",
+      "title": "Inadequate Privacy Controls",
+      "description": "Excessive permissions, PII leakage, or missing privacy disclosures.",
+      "finding_count": 11,
+      "findings": [
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Camera",
+          "description": "The Camera permission (NSCameraUsageDescription) has a very short or empty usage description: \"camera\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSCameraUsageDescription = \"camera\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Camera permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Microphone",
+          "description": "The Microphone permission (NSMicrophoneUsageDescription) has a very short or empty usage description: \"\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSMicrophoneUsageDescription = \"\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Microphone permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Location (Always)",
+          "description": "The Location (Always) permission (NSLocationAlwaysUsageDescription) has a very short or empty usage description: \"loc\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSLocationAlwaysUsageDescription = \"loc\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Location (Always) permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Contacts",
+          "description": "The Contacts permission (NSContactsUsageDescription) has a very short or empty usage description: \"contacts\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSContactsUsageDescription = \"contacts\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Contacts permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for HealthKit (Read)",
+          "description": "The HealthKit (Read) permission (NSHealthShareUsageDescription) has a very short or empty usage description: \"health\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSHealthShareUsageDescription = \"health\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the HealthKit (Read) permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Motion & Fitness",
+          "description": "The Motion & Fitness permission (NSMotionUsageDescription) has a very short or empty usage description: \"motion\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSMotionUsageDescription = \"motion\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Motion & Fitness permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Bluetooth",
+          "description": "The Bluetooth permission (NSBluetoothAlwaysUsageDescription) has a very short or empty usage description: \"ble\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSBluetoothAlwaysUsageDescription = \"ble\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Bluetooth permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Face ID",
+          "description": "The Face ID permission (NSFaceIDUsageDescription) has a very short or empty usage description: \"auth\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSFaceIDUsageDescription = \"auth\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Face ID permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-001",
+          "title": "Insufficient Usage Description for Local Network",
+          "description": "The Local Network permission (NSLocalNetworkUsageDescription) has a very short or empty usage description: \"network\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSLocalNetworkUsageDescription = \"network\""
+            }
+          ],
+          "remediation": "Provide a clear, specific usage description for the Local Network permission explaining why the app needs this access."
+        },
+        {
+          "id": "PERM-002",
+          "title": "Excessive Sensitive Permissions",
+          "description": "The app requests 10 sensitive permissions. Excessive permissions increase the attack surface and may indicate data over-collection.",
+          "severity": "Medium",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "NSCameraUsageDescription, NSMicrophoneUsageDescription, NSLocationAlwaysUsageDescription, NSContactsUsageDescription, NSHealthShareUsageDescription, NSMotionUsageDescription, NSBluetoothAlwaysUsageDescription, NSFaceIDUsageDescription"
+            }
+          ],
+          "remediation": "Review each permission and remove any that are not strictly necessary for core app functionality. Follow the principle of least privilege."
+        },
+        {
+          "id": "PERM-003",
+          "title": "Permissions Summary",
+          "description": "The app requests 10 permissions: Camera (NSCameraUsageDescription), Microphone (NSMicrophoneUsageDescription), Location (Always) (NSLocationAlwaysUsageDescription), Contacts (NSContactsUsageDescription), HealthKit (Read) (NSHealthShareUsageDescription), Motion & Fitness (NSMotionUsageDescription), Bluetooth (NSBluetoothAlwaysUsageDescription), Face ID (NSFaceIDUsageDescription), Local Network (NSLocalNetworkUsageDescription), App Tracking (ATT) (NSUserTrackingUsageDescription).",
+          "severity": "Info",
+          "owasp_category": "M6",
+          "evidence": [
+            {
+              "file": "Info.plist",
+              "line": null,
+              "snippet": "10 permissions requested"
+            }
+          ],
+          "remediation": "Review permissions for compliance with privacy regulations."
+        }
+      ]
+    },
+    {
+      "code": "M7",
+      "title": "Insufficient Binary Protections",
+      "description": "Missing PIE, stack canaries, ARC, or code stripping; lack of obfuscation or anti-tamper controls.",
+      "finding_count": 4,
+      "findings": [
+        {
+          "id": "BIN-001",
+          "title": "Binary Not Compiled as PIE",
+          "description": "The binary is not Position Independent Executable (PIE). ASLR cannot fully randomize the memory layout, making exploitation easier.",
+          "severity": "High",
+          "owasp_category": "M7",
+          "evidence": [
+            {
+              "file": "InsecureTestApp",
+              "line": null,
+              "snippet": "flags=0x00000085, MH_PIE not set"
+            }
+          ],
+          "remediation": "Compile with -fPIE / -pie linker flag. Xcode enables this by default."
+        },
+        {
+          "id": "BIN-002",
+          "title": "Stack Canaries Not Detected",
+          "description": "No stack canary symbols (___stack_chk_guard/fail) were found in the binary. Stack buffer overflows may be exploitable.",
+          "severity": "Medium",
+          "owasp_category": "M7",
+          "evidence": [
+            {
+              "file": "InsecureTestApp",
+              "line": null,
+              "snippet": "No stack_chk symbols found"
+            }
+          ],
+          "remediation": "Compile with -fstack-protector-all."
+        },
+        {
+          "id": "BIN-003",
+          "title": "ARC (Automatic Reference Counting) Not Detected",
+          "description": "No ARC-related symbols were found. Manual memory management is more prone to use-after-free and double-free vulnerabilities.",
+          "severity": "Medium",
+          "owasp_category": "M7",
+          "evidence": [
+            {
+              "file": "InsecureTestApp",
+              "line": null,
+              "snippet": "No objc_release/retain symbols"
+            }
+          ],
+          "remediation": "Enable ARC in Xcode build settings (-fobjc-arc)."
+        },
+        {
+          "id": "BIN-004",
+          "title": "Binary May Not Be Encrypted",
+          "description": "No encryption indicators were found. The binary may be a decrypted dump, making reverse engineering trivial.",
+          "severity": "Low",
+          "owasp_category": "M7",
+          "evidence": [
+            {
+              "file": "InsecureTestApp",
+              "line": null,
+              "snippet": "No cryptid reference found"
+            }
+          ],
+          "remediation": "Ensure the IPA is obtained from the App Store (encrypted). Consider additional obfuscation for sensitive logic."
+        }
+      ]
+    },
+    {
+      "code": "M8",
+      "title": "Security Misconfiguration",
+      "description": "Debug logging in production builds, insecure default settings, or exported components without restrictions.",
+      "finding_count": 5,
+      "findings": [
+        {
+          "id": "LOG-001",
+          "title": "NSLog Usage Detected",
+          "description": "NSLog Usage Detected in the application binary.",
+          "severity": "Medium",
+          "owasp_category": "M8",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 3,
+              "snippet": "NSLog"
+            }
+          ],
+          "remediation": "NSLog writes to the system console and can leak sensitive information to anyone with device access. Use os_log with appropriate privacy levels or remove logging in release builds."
+        },
+        {
+          "id": "LOG-003",
+          "title": "printf / fprintf Usage",
+          "description": "printf / fprintf Usage in the application binary.",
+          "severity": "Low",
+          "owasp_category": "M8",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 3,
+              "snippet": "NSLog"
+            }
+          ],
+          "remediation": "C-level print functions may leak information. Remove or guard with preprocessor macros for release builds."
+        },
+        {
+          "id": "LOG-004",
+          "title": "Debug Menu / Debug Mode Indicator",
+          "description": "Debug Menu / Debug Mode Indicator in the application binary.",
+          "severity": "Medium",
+          "owasp_category": "M8",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 5,
+              "snippet": "isDebug"
+            }
+          ],
+          "remediation": "Debug mode indicators suggest development features may be reachable in the production build. Remove all debug flags and menus from release builds."
+        },
+        {
+          "id": "LOG-002",
+          "title": "print() / debugPrint() in Binary",
+          "description": "print() / debugPrint() in Binary in the application binary.",
+          "severity": "Low",
+          "owasp_category": "M8",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 10,
+              "snippet": "debugPrint"
+            }
+          ],
+          "remediation": "Swift print/debugPrint statements are compiled into release builds by default. Use #if DEBUG guards or os_log."
+        },
+        {
+          "id": "LOG-005",
+          "title": "Test / Staging Server References",
+          "description": "Test / Staging Server References in the application binary.",
+          "severity": "Medium",
+          "owasp_category": "M8",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 11,
+              "snippet": "staging.api.example.com"
+            }
+          ],
+          "remediation": "References to staging or test servers were found. These may expose development infrastructure. Remove all non-production server references from release builds."
+        }
+      ]
+    },
+    {
+      "code": "M9",
+      "title": "Insecure Data Storage",
+      "description": "Sensitive data stored in plaintext plists, SQLite databases, or NSUserDefaults without protection.",
+      "finding_count": 3,
+      "findings": [
+        {
+          "id": "DATA-001",
+          "title": "Embedded Database File",
+          "description": "A database file (cache.sqlite) is bundled with the app. If it contains sensitive data, it may be extracted from the IPA without jailbreaking.",
+          "severity": "Medium",
+          "owasp_category": "M9",
+          "evidence": [
+            {
+              "file": "cache.sqlite",
+              "line": null,
+              "snippet": "cache.sqlite"
+            }
+          ],
+          "remediation": "Do not ship pre-populated databases with sensitive data. Encrypt databases using SQLCipher or Realm encryption. Use NSFileProtectionComplete for data-at-rest protection."
+        },
+        {
+          "id": "DATA-002",
+          "title": "Plist File Contains Sensitive Keys",
+          "description": "The plist file UserCache.plist contains keys that suggest sensitive data storage: api_secret, session_cookie, user_auth_token.",
+          "severity": "High",
+          "owasp_category": "M9",
+          "evidence": [
+            {
+              "file": "UserCache.plist",
+              "line": null,
+              "snippet": "Sensitive keys: api_secret, session_cookie, user_auth_token"
+            }
+          ],
+          "remediation": "Move sensitive data to the iOS Keychain. Never store credentials, tokens, or secrets in property lists."
+        },
+        {
+          "id": "DATA-003",
+          "title": "NSUserDefaults Usage Detected",
+          "description": "The app uses NSUserDefaults, which stores data in plaintext plist files on disk. Verify that no sensitive data is stored via UserDefaults.",
+          "severity": "Low",
+          "owasp_category": "M9",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": null,
+              "snippet": "NSUserDefaults / standardUserDefaults reference found"
+            }
+          ],
+          "remediation": "Do not store sensitive data in NSUserDefaults. Use the iOS Keychain (kSecClass) for credentials and tokens. Apply NSFileProtectionComplete to data files."
+        }
+      ]
+    },
+    {
+      "code": "M10",
+      "title": "Insufficient Cryptography",
+      "description": "Use of weak/deprecated algorithms (MD5, SHA-1, DES, RC4), hardcoded keys, or insufficient key lengths.",
+      "finding_count": 5,
+      "findings": [
+        {
+          "id": "CRYPTO-001",
+          "title": "MD5 Hash Usage",
+          "description": "Usage of md5 hash usage detected in the application binary.",
+          "severity": "Medium",
+          "owasp_category": "M10",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 2,
+              "snippet": "CC_MD5"
+            }
+          ],
+          "remediation": "MD5 is cryptographically broken and should not be used for security-sensitive operations. Migrate to SHA-256 or SHA-3."
+        },
+        {
+          "id": "CRYPTO-003",
+          "title": "DES / 3DES Encryption",
+          "description": "Usage of des / 3des encryption detected in the application binary.",
+          "severity": "High",
+          "owasp_category": "M10",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 7,
+              "snippet": "kCCAlgorithm3DES"
+            }
+          ],
+          "remediation": "DES and 3DES are deprecated. Migrate to AES-256 with GCM mode."
+        },
+        {
+          "id": "CRYPTO-005",
+          "title": "ECB Block Cipher Mode",
+          "description": "Usage of ecb block cipher mode detected in the application binary.",
+          "severity": "High",
+          "owasp_category": "M10",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 8,
+              "snippet": "kCCModeECB"
+            }
+          ],
+          "remediation": "ECB mode does not provide semantic security; identical plaintext blocks produce identical ciphertext. Use CBC, CTR, or GCM mode."
+        },
+        {
+          "id": "CRYPTO-008",
+          "title": "Insecure Random Number Generator",
+          "description": "Usage of insecure random number generator detected in the application binary.",
+          "severity": "Medium",
+          "owasp_category": "M10",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 9,
+              "snippet": "srand"
+            }
+          ],
+          "remediation": "Use SecRandomCopyBytes or arc4random_buf for cryptographically secure random numbers."
+        },
+        {
+          "id": "CRYPTO-006",
+          "title": "Hardcoded Encryption Key",
+          "description": "Usage of hardcoded encryption key detected in the application binary.",
+          "severity": "Critical",
+          "owasp_category": "M10",
+          "evidence": [
+            {
+              "file": "<binary>",
+              "line": 19,
+              "snippet": "encryption_key = \"hardcoded_aes_key_12345678\""
+            }
+          ],
+          "remediation": "Encryption keys must never be hardcoded. Use the iOS Keychain or a key derivation function (PBKDF2, Argon2)."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "SEC-001",
+      "title": "AWS Access Key ID (in binary)",
+      "description": "A potential aws access key id was found embedded in the application binary.",
+      "severity": "Critical",
+      "owasp_category": "M1",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 1,
+          "snippet": "AKIAIOSFODNN7EXAMPLE"
+        }
+      ],
+      "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+    },
+    {
+      "id": "SEC-011",
+      "title": "GitHub / GitLab Token (in binary)",
+      "description": "A potential github / gitlab token was found embedded in the application binary.",
+      "severity": "Critical",
+      "owasp_category": "M1",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 13,
+          "snippet": "ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef1234"
+        }
+      ],
+      "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+    },
+    {
+      "id": "SEC-006",
+      "title": "Private Key Block (in binary)",
+      "description": "A potential private key block was found embedded in the application binary.",
+      "severity": "Critical",
+      "owasp_category": "M1",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 14,
+          "snippet": "-----BEGIN RSA PRIVATE KEY-----"
+        }
+      ],
+      "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+    },
+    {
+      "id": "SEC-009",
+      "title": "Database Connection String (in binary)",
+      "description": "A potential database connection string was found embedded in the application binary.",
+      "severity": "Critical",
+      "owasp_category": "M1",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 15,
+          "snippet": "mongodb://admin:pw@prod.db.co:27017/db"
+        }
+      ],
+      "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+    },
+    {
+      "id": "CRYPTO-006",
+      "title": "Hardcoded Encryption Key",
+      "description": "Usage of hardcoded encryption key detected in the application binary.",
+      "severity": "Critical",
+      "owasp_category": "M10",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 19,
+          "snippet": "encryption_key = \"hardcoded_aes_key_12345678\""
+        }
+      ],
+      "remediation": "Encryption keys must never be hardcoded. Use the iOS Keychain or a key derivation function (PBKDF2, Argon2)."
+    },
+    {
+      "id": "SEC-008",
+      "title": "Bearer Token (in binary)",
+      "description": "A potential bearer token was found embedded in the application binary.",
+      "severity": "High",
+      "owasp_category": "M1",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 16,
+          "snippet": "Bearer eyJhbGciOiJIUzI1NiJ9.abcdefghijklmnop1234"
+        }
+      ],
+      "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+    },
+    {
+      "id": "SEC-005",
+      "title": "Generic API Key / Token (in binary)",
+      "description": "A potential generic api key / token was found embedded in the application binary.",
+      "severity": "High",
+      "owasp_category": "M1",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 17,
+          "snippet": "api_key = \"sk-proj-abc123456789012345678901234567890\""
+        }
+      ],
+      "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+    },
+    {
+      "id": "SEC-007",
+      "title": "Hardcoded Password (in binary)",
+      "description": "A potential hardcoded password was found embedded in the application binary.",
+      "severity": "High",
+      "owasp_category": "M1",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 18,
+          "snippet": "password = \"SuperSecret123!\""
+        }
+      ],
+      "remediation": "Remove hardcoded credentials from source code before compilation. Use the iOS Keychain or a secure server-side configuration service."
+    },
+    {
+      "id": "CRYPTO-003",
+      "title": "DES / 3DES Encryption",
+      "description": "Usage of des / 3des encryption detected in the application binary.",
+      "severity": "High",
+      "owasp_category": "M10",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 7,
+          "snippet": "kCCAlgorithm3DES"
+        }
+      ],
+      "remediation": "DES and 3DES are deprecated. Migrate to AES-256 with GCM mode."
+    },
+    {
+      "id": "CRYPTO-005",
+      "title": "ECB Block Cipher Mode",
+      "description": "Usage of ecb block cipher mode detected in the application binary.",
+      "severity": "High",
+      "owasp_category": "M10",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 8,
+          "snippet": "kCCModeECB"
+        }
+      ],
+      "remediation": "ECB mode does not provide semantic security; identical plaintext blocks produce identical ciphertext. Use CBC, CTR, or GCM mode."
+    },
+    {
+      "id": "TRANS-001",
+      "title": "App Transport Security Disabled Globally",
+      "description": "NSAllowsArbitraryLoads is set to YES, which disables App Transport Security for all network connections. This allows the app to make insecure HTTP connections.",
+      "severity": "High",
+      "owasp_category": "M5",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSAllowsArbitraryLoads = true"
+        }
+      ],
+      "remediation": "Set NSAllowsArbitraryLoads to NO and configure per-domain exceptions only for domains that truly require HTTP. Use HTTPS everywhere."
+    },
+    {
+      "id": "TRANS-004",
+      "title": "Weak TLS Version for legacy-api.example.com",
+      "description": "Domain 'legacy-api.example.com' allows TLSv1.0, which is deprecated and vulnerable.",
+      "severity": "High",
+      "owasp_category": "M5",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "legacy-api.example.com: NSExceptionMinimumTLSVersion = TLSv1.0"
+        }
+      ],
+      "remediation": "Require TLS 1.2 or higher for legacy-api.example.com."
+    },
+    {
+      "id": "BIN-001",
+      "title": "Binary Not Compiled as PIE",
+      "description": "The binary is not Position Independent Executable (PIE). ASLR cannot fully randomize the memory layout, making exploitation easier.",
+      "severity": "High",
+      "owasp_category": "M7",
+      "evidence": [
+        {
+          "file": "InsecureTestApp",
+          "line": null,
+          "snippet": "flags=0x00000085, MH_PIE not set"
+        }
+      ],
+      "remediation": "Compile with -fPIE / -pie linker flag. Xcode enables this by default."
+    },
+    {
+      "id": "DATA-002",
+      "title": "Plist File Contains Sensitive Keys",
+      "description": "The plist file UserCache.plist contains keys that suggest sensitive data storage: api_secret, session_cookie, user_auth_token.",
+      "severity": "High",
+      "owasp_category": "M9",
+      "evidence": [
+        {
+          "file": "UserCache.plist",
+          "line": null,
+          "snippet": "Sensitive keys: api_secret, session_cookie, user_auth_token"
+        }
+      ],
+      "remediation": "Move sensitive data to the iOS Keychain. Never store credentials, tokens, or secrets in property lists."
+    },
+    {
+      "id": "CRYPTO-001",
+      "title": "MD5 Hash Usage",
+      "description": "Usage of md5 hash usage detected in the application binary.",
+      "severity": "Medium",
+      "owasp_category": "M10",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 2,
+          "snippet": "CC_MD5"
+        }
+      ],
+      "remediation": "MD5 is cryptographically broken and should not be used for security-sensitive operations. Migrate to SHA-256 or SHA-3."
+    },
+    {
+      "id": "CRYPTO-008",
+      "title": "Insecure Random Number Generator",
+      "description": "Usage of insecure random number generator detected in the application binary.",
+      "severity": "Medium",
+      "owasp_category": "M10",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 9,
+          "snippet": "srand"
+        }
+      ],
+      "remediation": "Use SecRandomCopyBytes or arc4random_buf for cryptographically secure random numbers."
+    },
+    {
+      "id": "TRANS-002",
+      "title": "Arbitrary Loads Allowed in Web Content",
+      "description": "NSAllowsArbitraryLoadsInWebContent is enabled, allowing insecure loads within WebViews.",
+      "severity": "Medium",
+      "owasp_category": "M5",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSAllowsArbitraryLoadsInWebContent = true"
+        }
+      ],
+      "remediation": "Disable this flag and ensure all web content is served over HTTPS."
+    },
+    {
+      "id": "TRANS-003",
+      "title": "Insecure HTTP Allowed for legacy-api.example.com",
+      "description": "The domain 'legacy-api.example.com' has NSExceptionAllowsInsecureHTTPLoads enabled, allowing plaintext HTTP connections.",
+      "severity": "Medium",
+      "owasp_category": "M5",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "legacy-api.example.com: NSExceptionAllowsInsecureHTTPLoads = true"
+        }
+      ],
+      "remediation": "Migrate legacy-api.example.com to HTTPS and remove this exception."
+    },
+    {
+      "id": "TRANS-005",
+      "title": "Hardcoded HTTP URL",
+      "description": "A plaintext HTTP URL (http://api.insecure.com) was found in the binary. Data transmitted over HTTP is susceptible to interception.",
+      "severity": "Medium",
+      "owasp_category": "M5",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 6,
+          "snippet": "http://api.insecure.com"
+        }
+      ],
+      "remediation": "Replace all HTTP URLs with HTTPS equivalents."
+    },
+    {
+      "id": "TRANS-005",
+      "title": "Hardcoded HTTP URL",
+      "description": "A plaintext HTTP URL (http://tracking.example.net) was found in the binary. Data transmitted over HTTP is susceptible to interception.",
+      "severity": "Medium",
+      "owasp_category": "M5",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 20,
+          "snippet": "http://tracking.example.net"
+        }
+      ],
+      "remediation": "Replace all HTTP URLs with HTTPS equivalents."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Camera",
+      "description": "The Camera permission (NSCameraUsageDescription) has a very short or empty usage description: \"camera\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSCameraUsageDescription = \"camera\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Camera permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Microphone",
+      "description": "The Microphone permission (NSMicrophoneUsageDescription) has a very short or empty usage description: \"\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSMicrophoneUsageDescription = \"\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Microphone permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Location (Always)",
+      "description": "The Location (Always) permission (NSLocationAlwaysUsageDescription) has a very short or empty usage description: \"loc\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSLocationAlwaysUsageDescription = \"loc\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Location (Always) permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Contacts",
+      "description": "The Contacts permission (NSContactsUsageDescription) has a very short or empty usage description: \"contacts\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSContactsUsageDescription = \"contacts\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Contacts permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for HealthKit (Read)",
+      "description": "The HealthKit (Read) permission (NSHealthShareUsageDescription) has a very short or empty usage description: \"health\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSHealthShareUsageDescription = \"health\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the HealthKit (Read) permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Motion & Fitness",
+      "description": "The Motion & Fitness permission (NSMotionUsageDescription) has a very short or empty usage description: \"motion\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSMotionUsageDescription = \"motion\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Motion & Fitness permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Bluetooth",
+      "description": "The Bluetooth permission (NSBluetoothAlwaysUsageDescription) has a very short or empty usage description: \"ble\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSBluetoothAlwaysUsageDescription = \"ble\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Bluetooth permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Face ID",
+      "description": "The Face ID permission (NSFaceIDUsageDescription) has a very short or empty usage description: \"auth\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSFaceIDUsageDescription = \"auth\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Face ID permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-001",
+      "title": "Insufficient Usage Description for Local Network",
+      "description": "The Local Network permission (NSLocalNetworkUsageDescription) has a very short or empty usage description: \"network\". Apple may reject apps with vague privacy descriptions, and users cannot make informed consent decisions.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSLocalNetworkUsageDescription = \"network\""
+        }
+      ],
+      "remediation": "Provide a clear, specific usage description for the Local Network permission explaining why the app needs this access."
+    },
+    {
+      "id": "PERM-002",
+      "title": "Excessive Sensitive Permissions",
+      "description": "The app requests 10 sensitive permissions. Excessive permissions increase the attack surface and may indicate data over-collection.",
+      "severity": "Medium",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "NSCameraUsageDescription, NSMicrophoneUsageDescription, NSLocationAlwaysUsageDescription, NSContactsUsageDescription, NSHealthShareUsageDescription, NSMotionUsageDescription, NSBluetoothAlwaysUsageDescription, NSFaceIDUsageDescription"
+        }
+      ],
+      "remediation": "Review each permission and remove any that are not strictly necessary for core app functionality. Follow the principle of least privilege."
+    },
+    {
+      "id": "BIN-002",
+      "title": "Stack Canaries Not Detected",
+      "description": "No stack canary symbols (___stack_chk_guard/fail) were found in the binary. Stack buffer overflows may be exploitable.",
+      "severity": "Medium",
+      "owasp_category": "M7",
+      "evidence": [
+        {
+          "file": "InsecureTestApp",
+          "line": null,
+          "snippet": "No stack_chk symbols found"
+        }
+      ],
+      "remediation": "Compile with -fstack-protector-all."
+    },
+    {
+      "id": "BIN-003",
+      "title": "ARC (Automatic Reference Counting) Not Detected",
+      "description": "No ARC-related symbols were found. Manual memory management is more prone to use-after-free and double-free vulnerabilities.",
+      "severity": "Medium",
+      "owasp_category": "M7",
+      "evidence": [
+        {
+          "file": "InsecureTestApp",
+          "line": null,
+          "snippet": "No objc_release/retain symbols"
+        }
+      ],
+      "remediation": "Enable ARC in Xcode build settings (-fobjc-arc)."
+    },
+    {
+      "id": "DATA-001",
+      "title": "Embedded Database File",
+      "description": "A database file (cache.sqlite) is bundled with the app. If it contains sensitive data, it may be extracted from the IPA without jailbreaking.",
+      "severity": "Medium",
+      "owasp_category": "M9",
+      "evidence": [
+        {
+          "file": "cache.sqlite",
+          "line": null,
+          "snippet": "cache.sqlite"
+        }
+      ],
+      "remediation": "Do not ship pre-populated databases with sensitive data. Encrypt databases using SQLCipher or Realm encryption. Use NSFileProtectionComplete for data-at-rest protection."
+    },
+    {
+      "id": "URL-001",
+      "title": "Custom URL Scheme: insecureapp://",
+      "description": "The app registers a custom URL scheme 'insecureapp://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+      "severity": "Medium",
+      "owasp_category": "M3",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "CFBundleURLSchemes = [insecureapp], Name = d"
+        }
+      ],
+      "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+    },
+    {
+      "id": "URL-001",
+      "title": "Custom URL Scheme: myapp-debug://",
+      "description": "The app registers a custom URL scheme 'myapp-debug://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+      "severity": "Medium",
+      "owasp_category": "M3",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "CFBundleURLSchemes = [myapp-debug], Name = d"
+        }
+      ],
+      "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+    },
+    {
+      "id": "URL-001",
+      "title": "Custom URL Scheme: insecureapp-oauth://",
+      "description": "The app registers a custom URL scheme 'insecureapp-oauth://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+      "severity": "Medium",
+      "owasp_category": "M3",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "CFBundleURLSchemes = [insecureapp-oauth], Name = o"
+        }
+      ],
+      "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+    },
+    {
+      "id": "URL-001",
+      "title": "Custom URL Scheme: myapp-callback://",
+      "description": "The app registers a custom URL scheme 'myapp-callback://'. Custom URL schemes can be hijacked by malicious apps and do not support origin validation like Universal Links.",
+      "severity": "Medium",
+      "owasp_category": "M3",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "CFBundleURLSchemes = [myapp-callback], Name = o"
+        }
+      ],
+      "remediation": "Migrate to Universal Links (Associated Domains) which provide origin validation. If custom URL schemes are required, validate all incoming parameters and never pass sensitive data through URL scheme callbacks."
+    },
+    {
+      "id": "URL-002",
+      "title": "Excessive URL Schemes Registered",
+      "description": "The app registers 4 custom URL schemes: insecureapp, myapp-debug, insecureapp-oauth, myapp-callback. Each scheme expands the app's attack surface.",
+      "severity": "Medium",
+      "owasp_category": "M3",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "4 custom URL schemes"
+        }
+      ],
+      "remediation": "Minimize the number of URL schemes. Prefer Universal Links."
+    },
+    {
+      "id": "LOG-001",
+      "title": "NSLog Usage Detected",
+      "description": "NSLog Usage Detected in the application binary.",
+      "severity": "Medium",
+      "owasp_category": "M8",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 3,
+          "snippet": "NSLog"
+        }
+      ],
+      "remediation": "NSLog writes to the system console and can leak sensitive information to anyone with device access. Use os_log with appropriate privacy levels or remove logging in release builds."
+    },
+    {
+      "id": "LOG-004",
+      "title": "Debug Menu / Debug Mode Indicator",
+      "description": "Debug Menu / Debug Mode Indicator in the application binary.",
+      "severity": "Medium",
+      "owasp_category": "M8",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 5,
+          "snippet": "isDebug"
+        }
+      ],
+      "remediation": "Debug mode indicators suggest development features may be reachable in the production build. Remove all debug flags and menus from release builds."
+    },
+    {
+      "id": "LOG-005",
+      "title": "Test / Staging Server References",
+      "description": "Test / Staging Server References in the application binary.",
+      "severity": "Medium",
+      "owasp_category": "M8",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 11,
+          "snippet": "staging.api.example.com"
+        }
+      ],
+      "remediation": "References to staging or test servers were found. These may expose development infrastructure. Remove all non-production server references from release builds."
+    },
+    {
+      "id": "BIN-004",
+      "title": "Binary May Not Be Encrypted",
+      "description": "No encryption indicators were found. The binary may be a decrypted dump, making reverse engineering trivial.",
+      "severity": "Low",
+      "owasp_category": "M7",
+      "evidence": [
+        {
+          "file": "InsecureTestApp",
+          "line": null,
+          "snippet": "No cryptid reference found"
+        }
+      ],
+      "remediation": "Ensure the IPA is obtained from the App Store (encrypted). Consider additional obfuscation for sensitive logic."
+    },
+    {
+      "id": "DATA-003",
+      "title": "NSUserDefaults Usage Detected",
+      "description": "The app uses NSUserDefaults, which stores data in plaintext plist files on disk. Verify that no sensitive data is stored via UserDefaults.",
+      "severity": "Low",
+      "owasp_category": "M9",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": null,
+          "snippet": "NSUserDefaults / standardUserDefaults reference found"
+        }
+      ],
+      "remediation": "Do not store sensitive data in NSUserDefaults. Use the iOS Keychain (kSecClass) for credentials and tokens. Apply NSFileProtectionComplete to data files."
+    },
+    {
+      "id": "URL-003",
+      "title": "No Universal Links Configured",
+      "description": "The app uses custom URL schemes but does not configure Universal Links (Associated Domains with applinks:). Universal Links provide cryptographic origin verification that custom URL schemes lack.",
+      "severity": "Low",
+      "owasp_category": "M3",
+      "evidence": [
+        {
+          "file": "Entitlements",
+          "line": null,
+          "snippet": "No applinks: entries in associated-domains"
+        }
+      ],
+      "remediation": "Implement Universal Links via Associated Domains. See Apple's documentation on Supporting Universal Links."
+    },
+    {
+      "id": "LOG-003",
+      "title": "printf / fprintf Usage",
+      "description": "printf / fprintf Usage in the application binary.",
+      "severity": "Low",
+      "owasp_category": "M8",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 3,
+          "snippet": "NSLog"
+        }
+      ],
+      "remediation": "C-level print functions may leak information. Remove or guard with preprocessor macros for release builds."
+    },
+    {
+      "id": "LOG-002",
+      "title": "print() / debugPrint() in Binary",
+      "description": "print() / debugPrint() in Binary in the application binary.",
+      "severity": "Low",
+      "owasp_category": "M8",
+      "evidence": [
+        {
+          "file": "<binary>",
+          "line": 10,
+          "snippet": "debugPrint"
+        }
+      ],
+      "remediation": "Swift print/debugPrint statements are compiled into release builds by default. Use #if DEBUG guards or os_log."
+    },
+    {
+      "id": "PERM-003",
+      "title": "Permissions Summary",
+      "description": "The app requests 10 permissions: Camera (NSCameraUsageDescription), Microphone (NSMicrophoneUsageDescription), Location (Always) (NSLocationAlwaysUsageDescription), Contacts (NSContactsUsageDescription), HealthKit (Read) (NSHealthShareUsageDescription), Motion & Fitness (NSMotionUsageDescription), Bluetooth (NSBluetoothAlwaysUsageDescription), Face ID (NSFaceIDUsageDescription), Local Network (NSLocalNetworkUsageDescription), App Tracking (ATT) (NSUserTrackingUsageDescription).",
+      "severity": "Info",
+      "owasp_category": "M6",
+      "evidence": [
+        {
+          "file": "Info.plist",
+          "line": null,
+          "snippet": "10 permissions requested"
+        }
+      ],
+      "remediation": "Review permissions for compliance with privacy regulations."
+    }
+  ]
+}

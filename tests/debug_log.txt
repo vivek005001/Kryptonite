@@ -1,0 +1,8 @@
+Starting...
+Imports OK
+Binary created: 596 bytes
+Plist created: 1151 bytes
+IPA created: /Users/vivek/Downloads/kryptonite/tests/test_app.ipa (2132 bytes)
+
+--- Running scan ---
+Scan exit code: 1
