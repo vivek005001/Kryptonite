@@ -1,4 +1,4 @@
-"""IPA file extraction and app-bundle context."""
+"""IPA file extraction, APK support, and app-bundle context."""
 
 from __future__ import annotations
 
@@ -15,35 +15,59 @@ from typing import Any
 
 @dataclass
 class AppContext:
-    """Holds all data extracted from an IPA needed by analyzers."""
+    """Holds all data extracted from an IPA/APK needed by analyzers."""
 
     ipa_path: Path
     temp_dir: Path
     app_dir: Path
+    platform: str = "ios"  # "ios" or "android"
     info_plist: dict[str, Any] = field(default_factory=dict)
     entitlements: dict[str, Any] = field(default_factory=dict)
     binary_path: Path | None = None
     binary_strings: list[str] = field(default_factory=list)
     all_files: list[Path] = field(default_factory=list)
 
+    # ── Android-specific fields ─────────────────────────────────
+    android_manifest: dict[str, Any] = field(default_factory=dict)
+    package_name: str = ""
+    min_sdk_version: str = ""
+    target_sdk_version: str = ""
+    dex_files: list[Path] = field(default_factory=list)
+    native_libs: list[Path] = field(default_factory=list)
+
     # ── helpers ──────────────────────────────────────────────────────
     @property
     def bundle_id(self) -> str:
+        if self.platform == "android":
+            return self.package_name or "unknown"
         return self.info_plist.get("CFBundleIdentifier", "unknown")
 
     @property
     def bundle_name(self) -> str:
+        if self.platform == "android":
+            label = self.android_manifest.get("application_label", "")
+            return label or self.package_name or "Unknown"
         return self.info_plist.get("CFBundleDisplayName",
                                    self.info_plist.get("CFBundleName", "Unknown"))
 
     @property
     def bundle_version(self) -> str:
+        if self.platform == "android":
+            return self.android_manifest.get("version_name",
+                   self.android_manifest.get("version_code", "0.0"))
         return self.info_plist.get("CFBundleShortVersionString",
                                    self.info_plist.get("CFBundleVersion", "0.0"))
 
     @property
     def min_os_version(self) -> str:
+        if self.platform == "android":
+            return f"SDK {self.min_sdk_version}" if self.min_sdk_version else "unknown"
         return self.info_plist.get("MinimumOSVersion", "unknown")
+
+    @property
+    def app_name(self) -> str:
+        """Platform-aware app name."""
+        return self.bundle_name
 
     def text_files(self) -> list[Path]:
         """Return all text-readable files in the app bundle."""
@@ -51,6 +75,7 @@ class AppContext:
             ".plist", ".xml", ".json", ".strings", ".js", ".html",
             ".css", ".txt", ".cfg", ".conf", ".yml", ".yaml", ".md",
             ".swift", ".m", ".h", ".c", ".cpp", ".storyboard", ".xib",
+            ".properties", ".gradle", ".pro", ".kt", ".java", ".smali",
         }
         return [f for f in self.all_files if f.suffix.lower() in text_exts]
 

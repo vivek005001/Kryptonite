@@ -10,6 +10,7 @@ from typing import Any
 
 from jinja2 import Template
 
+from kryptonite import __version__
 from kryptonite.core.finding import Finding, SeverityLevel
 from kryptonite.core.owasp import OwaspCategory
 
@@ -68,7 +69,7 @@ def _build_report_data(
     return {
         "meta": {
             "tool": "Kryptonite",
-            "version": "1.0.0",
+            "version": __version__,
             "scan_date": datetime.now(timezone.utc).isoformat(),
         },
         "app_info": app_info,

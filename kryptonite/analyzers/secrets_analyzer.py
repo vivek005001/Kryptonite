@@ -121,9 +121,12 @@ def run(ctx: AppContext) -> list[Finding]:
                         evidence=[Evidence(file=rel, line=lineno, snippet=snippet)],
                         remediation=(
                             "Remove hardcoded credentials from source code. "
-                            "Use secure storage mechanisms such as the iOS "
-                            "Keychain, environment variables injected at build "
-                            "time, or a remote secrets manager."
+                            + ("Use the Android Keystore, EncryptedSharedPreferences, "
+                               "or a remote secrets manager."
+                               if ctx.platform == "android" else
+                               "Use secure storage mechanisms such as the iOS "
+                               "Keychain, environment variables injected at build "
+                               "time, or a remote secrets manager.")
                         ),
                     ))
 
@@ -151,8 +154,12 @@ def run(ctx: AppContext) -> list[Finding]:
                     )],
                     remediation=(
                         "Remove hardcoded credentials from source code before "
-                        "compilation. Use the iOS Keychain or a secure "
-                        "server-side configuration service."
+                        "compilation. "
+                        + ("Use the Android Keystore or a secure "
+                           "server-side configuration service."
+                           if ctx.platform == "android" else
+                           "Use the iOS Keychain or a secure "
+                           "server-side configuration service.")
                     ),
                 ))
 

@@ -1,414 +1,576 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kryptonite Security Report — {{ app_info.bundle_name }}</title>
-<style>
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #242836;
-    --border: #2e3348;
-    --text: #e1e4ed;
-    --text-dim: #8b90a5;
-    --accent: #7c5cfc;
-    --accent-glow: rgba(124, 92, 252, 0.25);
-    --critical: #ff4d6a;
-    --high: #ff8c42;
-    --medium: #ffc233;
-    --low: #4ecdc4;
-    --info: #5b9bd5;
-    --green: #2ecc71;
-    --radius: 12px;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kryptonite Security Report — {{ app_info.bundle_name }}</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #242836;
+      --border: #2e3348;
+      --text: #e1e4ed;
+      --text-dim: #8b90a5;
+      --accent: #7c5cfc;
+      --accent-glow: rgba(124, 92, 252, 0.25);
+      --critical: #ff4d6a;
+      --high: #ff8c42;
+      --medium: #ffc233;
+      --low: #4ecdc4;
+      --info: #5b9bd5;
+      --green: #2ecc71;
+      --radius: 12px;
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-    padding: 2rem;
-  }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+    }
 
-  .container { max-width: 1100px; margin: 0 auto; }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
 
-  /* header */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .header .meta-info { text-align: right; color: var(--text-dim); font-size: 0.85rem; }
+    /* header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* cards */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .card h2 {
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text);
-  }
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-  /* summary row */
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  .stat-card {
-    background: var(--surface2);
-    border-radius: 10px;
-    padding: 1.25rem;
-    text-align: center;
-    border: 1px solid var(--border);
-  }
-  .stat-card .number {
-    font-size: 2rem;
-    font-weight: 700;
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-  .stat-card .label {
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
+    .header .meta-info {
+      text-align: right;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
 
-  /* risk gauge */
-  .risk-gauge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  .gauge-bar {
-    flex: 1;
-    height: 12px;
-    background: var(--surface2);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .gauge-fill {
-    height: 100%;
-    border-radius: 6px;
-    transition: width 0.5s ease;
-  }
-  .risk-label {
-    font-weight: 700;
-    font-size: 1rem;
-    min-width: 70px;
-  }
+    .platform-badge {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 0.75rem;
+    }
 
-  /* severity badges */
-  .badge {
-    display: inline-block;
-    padding: 0.2rem 0.65rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .badge-critical { background: rgba(255,77,106,0.15); color: var(--critical); border: 1px solid rgba(255,77,106,0.3); }
-  .badge-high     { background: rgba(255,140,66,0.15);  color: var(--high);     border: 1px solid rgba(255,140,66,0.3); }
-  .badge-medium   { background: rgba(255,194,51,0.15);  color: var(--medium);   border: 1px solid rgba(255,194,51,0.3); }
-  .badge-low      { background: rgba(78,205,196,0.15);  color: var(--low);      border: 1px solid rgba(78,205,196,0.3); }
-  .badge-info     { background: rgba(91,155,213,0.15);  color: var(--info);     border: 1px solid rgba(91,155,213,0.3); }
+    .platform-ios {
+      background: rgba(91, 155, 213, 0.15);
+      color: var(--info);
+      border: 1px solid rgba(91, 155, 213, 0.3);
+    }
 
-  /* OWASP table */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  th {
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-  }
-  td { font-size: 0.9rem; }
-  tr:hover { background: var(--surface2); }
-  .count-zero { color: var(--green); }
-  .count-nonzero { color: var(--critical); font-weight: 700; }
+    .platform-android {
+      background: rgba(78, 205, 196, 0.15);
+      color: var(--low);
+      border: 1px solid rgba(78, 205, 196, 0.3);
+    }
 
-  /* findings */
-  .finding {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    border-left: 4px solid var(--text-dim);
-  }
-  .finding.sev-Critical { border-left-color: var(--critical); }
-  .finding.sev-High     { border-left-color: var(--high); }
-  .finding.sev-Medium   { border-left-color: var(--medium); }
-  .finding.sev-Low      { border-left-color: var(--low); }
-  .finding.sev-Info     { border-left-color: var(--info); }
+    /* cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
 
-  .finding-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-  }
-  .finding-title { font-weight: 600; font-size: 1rem; }
-  .finding-id { color: var(--text-dim); font-size: 0.8rem; font-family: monospace; }
-  .finding-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .card h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
 
-  .evidence-block {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.75rem;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    font-size: 0.82rem;
-    color: var(--text-dim);
-    overflow-x: auto;
-  }
-  .evidence-file { color: var(--accent); }
-  .evidence-line { color: var(--medium); }
+    /* summary row */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
 
-  .remediation {
-    background: rgba(46, 204, 113, 0.08);
-    border: 1px solid rgba(46, 204, 113, 0.2);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 0.88rem;
-    color: var(--green);
-  }
-  .remediation::before {
-    content: '💡 ';
-  }
+    .stat-card {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
 
-  /* app info */
-  .app-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 0.75rem;
-  }
-  .app-info-item {
-    display: flex;
-    flex-direction: column;
-  }
-  .app-info-label {
-    font-size: 0.75rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.15rem;
-  }
-  .app-info-value { font-weight: 500; }
+    .stat-card .number {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
 
-  /* owasp anchor nav */
-  .owasp-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .owasp-nav a {
-    padding: 0.35rem 0.75rem;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    text-decoration: none;
-    font-size: 0.82rem;
-    font-weight: 500;
-    transition: all 0.2s;
-  }
-  .owasp-nav a:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-  }
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-  .footer {
-    text-align: center;
-    color: var(--text-dim);
-    font-size: 0.8rem;
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-  }
-</style>
+    /* risk gauge */
+    .risk-gauge {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .gauge-bar {
+      flex: 1;
+      height: 12px;
+      background: var(--surface2);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .gauge-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.5s ease;
+    }
+
+    .risk-label {
+      font-weight: 700;
+      font-size: 1rem;
+      min-width: 70px;
+    }
+
+    /* severity badges */
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-critical {
+      background: rgba(255, 77, 106, 0.15);
+      color: var(--critical);
+      border: 1px solid rgba(255, 77, 106, 0.3);
+    }
+
+    .badge-high {
+      background: rgba(255, 140, 66, 0.15);
+      color: var(--high);
+      border: 1px solid rgba(255, 140, 66, 0.3);
+    }
+
+    .badge-medium {
+      background: rgba(255, 194, 51, 0.15);
+      color: var(--medium);
+      border: 1px solid rgba(255, 194, 51, 0.3);
+    }
+
+    .badge-low {
+      background: rgba(78, 205, 196, 0.15);
+      color: var(--low);
+      border: 1px solid rgba(78, 205, 196, 0.3);
+    }
+
+    .badge-info {
+      background: rgba(91, 155, 213, 0.15);
+      color: var(--info);
+      border: 1px solid rgba(91, 155, 213, 0.3);
+    }
+
+    /* OWASP table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    td {
+      font-size: 0.9rem;
+    }
+
+    tr:hover {
+      background: var(--surface2);
+    }
+
+    .count-zero {
+      color: var(--green);
+    }
+
+    .count-nonzero {
+      color: var(--critical);
+      font-weight: 700;
+    }
+
+    /* findings */
+    .finding {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--text-dim);
+    }
+
+    .finding.sev-Critical {
+      border-left-color: var(--critical);
+    }
+
+    .finding.sev-High {
+      border-left-color: var(--high);
+    }
+
+    .finding.sev-Medium {
+      border-left-color: var(--medium);
+    }
+
+    .finding.sev-Low {
+      border-left-color: var(--low);
+    }
+
+    .finding.sev-Info {
+      border-left-color: var(--info);
+    }
+
+    .finding-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .finding-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .finding-id {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      font-family: monospace;
+    }
+
+    .finding-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .evidence-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      overflow-x: auto;
+    }
+
+    .evidence-file {
+      color: var(--accent);
+    }
+
+    .evidence-line {
+      color: var(--medium);
+    }
+
+    .remediation {
+      background: rgba(46, 204, 113, 0.08);
+      border: 1px solid rgba(46, 204, 113, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      color: var(--green);
+    }
+
+    .remediation::before {
+      content: '💡 ';
+    }
+
+    /* app info */
+    .app-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .app-info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-info-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.15rem;
+    }
+
+    .app-info-value {
+      font-weight: 500;
+    }
+
+    /* owasp anchor nav */
+    .owasp-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .owasp-nav a {
+      padding: 0.35rem 0.75rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .owasp-nav a:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
 </head>
+
 <body>
-<div class="container">
+  <div class="container">
 
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <h1>🛡️ Kryptonite Security Report</h1>
-    </div>
-    <div class="meta-info">
-      <div>Scanned: {{ meta.scan_date[:10] }}</div>
-      <div>Kryptonite v{{ meta.version }}</div>
-    </div>
-  </div>
-
-  <!-- App Info -->
-  <div class="card">
-    <h2>📱 Application Information</h2>
-    <div class="app-info-grid">
-      <div class="app-info-item">
-        <span class="app-info-label">Bundle Name</span>
-        <span class="app-info-value">{{ app_info.bundle_name }}</span>
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1>🛡️ Kryptonite Security Report
+          <span class="platform-badge platform-{{ app_info.platform|lower }}">{{ app_info.platform }}</span>
+        </h1>
       </div>
-      <div class="app-info-item">
-        <span class="app-info-label">Bundle ID</span>
-        <span class="app-info-value">{{ app_info.bundle_id }}</span>
-      </div>
-      <div class="app-info-item">
-        <span class="app-info-label">Version</span>
-        <span class="app-info-value">{{ app_info.bundle_version }}</span>
-      </div>
-      <div class="app-info-item">
-        <span class="app-info-label">Min iOS Version</span>
-        <span class="app-info-value">{{ app_info.min_os_version }}</span>
-      </div>
-      <div class="app-info-item">
-        <span class="app-info-label">IPA File</span>
-        <span class="app-info-value">{{ app_info.ipa_file }}</span>
-      </div>
-      <div class="app-info-item">
-        <span class="app-info-label">Files in Bundle</span>
-        <span class="app-info-value">{{ app_info.total_files }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Risk Summary -->
-  <div class="card">
-    <h2>📊 Risk Summary</h2>
-    <div class="summary-grid">
-      <div class="stat-card">
-        <span class="number">{{ summary.total_findings }}</span>
-        <span class="label">Total Findings</span>
-      </div>
-      <div class="stat-card">
-        <span class="number" style="color: var(--critical)">{{ summary.severity_breakdown.get('Critical', 0) }}</span>
-        <span class="label">Critical</span>
-      </div>
-      <div class="stat-card">
-        <span class="number" style="color: var(--high)">{{ summary.severity_breakdown.get('High', 0) }}</span>
-        <span class="label">High</span>
-      </div>
-      <div class="stat-card">
-        <span class="number" style="color: var(--medium)">{{ summary.severity_breakdown.get('Medium', 0) }}</span>
-        <span class="label">Medium</span>
-      </div>
-      <div class="stat-card">
-        <span class="number" style="color: var(--low)">{{ summary.severity_breakdown.get('Low', 0) }}</span>
-        <span class="label">Low</span>
-      </div>
-      <div class="stat-card">
-        <span class="number" style="color: var(--info)">{{ summary.severity_breakdown.get('Info', 0) }}</span>
-        <span class="label">Info</span>
+      <div class="meta-info">
+        <div>Scanned: {{ meta.scan_date[:10] }}</div>
+        <div>Kryptonite v{{ meta.version }}</div>
       </div>
     </div>
 
-    <div class="risk-gauge">
-      <span style="font-size:0.85rem;color:var(--text-dim)">Risk Score</span>
-      <div class="gauge-bar">
-        <div class="gauge-fill" style="width:{{ summary.risk_score }}%;background:{% if summary.risk_score >= 75 %}var(--critical){% elif summary.risk_score >= 50 %}var(--high){% elif summary.risk_score >= 25 %}var(--medium){% else %}var(--green){% endif %};"></div>
+    <!-- App Info -->
+    <div class="card">
+      <h2>📱 Application Information</h2>
+      <div class="app-info-grid">
+        <div class="app-info-item">
+          <span class="app-info-label">App Name</span>
+          <span class="app-info-value">{{ app_info.bundle_name }}</span>
+        </div>
+        <div class="app-info-item">
+          <span class="app-info-label">{% if app_info.platform == 'Android' %}Package Name{% else %}Bundle ID{% endif
+            %}</span>
+          <span class="app-info-value">{{ app_info.bundle_id }}</span>
+        </div>
+        <div class="app-info-item">
+          <span class="app-info-label">Version</span>
+          <span class="app-info-value">{{ app_info.bundle_version }}</span>
+        </div>
+        <div class="app-info-item">
+          <span class="app-info-label">{% if app_info.platform == 'Android' %}Min SDK{% else %}Min iOS Version{% endif
+            %}</span>
+          <span class="app-info-value">{{ app_info.min_os_version }}</span>
+        </div>
+        {% if app_info.target_sdk %}
+        <div class="app-info-item">
+          <span class="app-info-label">Target SDK</span>
+          <span class="app-info-value">{{ app_info.target_sdk }}</span>
+        </div>
+        {% endif %}
+        <div class="app-info-item">
+          <span class="app-info-label">{% if app_info.platform == 'Android' %}APK File{% else %}IPA File{% endif
+            %}</span>
+          <span class="app-info-value">{{ app_info.app_file }}</span>
+        </div>
+        <div class="app-info-item">
+          <span class="app-info-label">Files in Bundle</span>
+          <span class="app-info-value">{{ app_info.total_files }}</span>
+        </div>
+        {% if app_info.dex_files %}
+        <div class="app-info-item">
+          <span class="app-info-label">DEX Files</span>
+          <span class="app-info-value">{{ app_info.dex_files }}</span>
+        </div>
+        {% endif %}
+        {% if app_info.native_libs %}
+        <div class="app-info-item">
+          <span class="app-info-label">Native Libraries</span>
+          <span class="app-info-value">{{ app_info.native_libs }}</span>
+        </div>
+        {% endif %}
       </div>
-      <span class="risk-label" style="color:{% if summary.risk_score >= 75 %}var(--critical){% elif summary.risk_score >= 50 %}var(--high){% elif summary.risk_score >= 25 %}var(--medium){% else %}var(--green){% endif %}">{{ summary.risk_score }}/100 {{ summary.risk_label }}</span>
     </div>
-  </div>
 
-  <!-- OWASP Mapping -->
-  <div class="card">
-    <h2>🔗 OWASP Mobile Top 10 (2024) Mapping</h2>
-    <table>
-      <thead>
-        <tr><th>Code</th><th>Category</th><th>Findings</th></tr>
-      </thead>
-      <tbody>
-        {% for cat in owasp_mapping %}
-        <tr>
-          <td><strong>{{ cat.code }}</strong></td>
-          <td>{{ cat.title }}</td>
-          <td class="{{ 'count-nonzero' if cat.finding_count > 0 else 'count-zero' }}">{{ cat.finding_count }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <!-- Risk Summary -->
+    <div class="card">
+      <h2>📊 Risk Summary</h2>
+      <div class="summary-grid">
+        <div class="stat-card">
+          <span class="number">{{ summary.total_findings }}</span>
+          <span class="label">Total Findings</span>
+        </div>
+        <div class="stat-card">
+          <span class="number" style="color: var(--critical)">{{ summary.severity_breakdown.get('Critical', 0) }}</span>
+          <span class="label">Critical</span>
+        </div>
+        <div class="stat-card">
+          <span class="number" style="color: var(--high)">{{ summary.severity_breakdown.get('High', 0) }}</span>
+          <span class="label">High</span>
+        </div>
+        <div class="stat-card">
+          <span class="number" style="color: var(--medium)">{{ summary.severity_breakdown.get('Medium', 0) }}</span>
+          <span class="label">Medium</span>
+        </div>
+        <div class="stat-card">
+          <span class="number" style="color: var(--low)">{{ summary.severity_breakdown.get('Low', 0) }}</span>
+          <span class="label">Low</span>
+        </div>
+        <div class="stat-card">
+          <span class="number" style="color: var(--info)">{{ summary.severity_breakdown.get('Info', 0) }}</span>
+          <span class="label">Info</span>
+        </div>
+      </div>
 
-  <!-- OWASP Category Navigation -->
-  <div class="owasp-nav">
+      <div class="risk-gauge">
+        <span style="font-size:0.85rem;color:var(--text-dim)">Risk Score</span>
+        <div class="gauge-bar">
+          <div class="gauge-fill"
+            style="width:{{ summary.risk_score }}%;background:{% if summary.risk_score >= 75 %}var(--critical){% elif summary.risk_score >= 50 %}var(--high){% elif summary.risk_score >= 25 %}var(--medium){% else %}var(--green){% endif %};">
+          </div>
+        </div>
+        <span class="risk-label"
+          style="color:{% if summary.risk_score >= 75 %}var(--critical){% elif summary.risk_score >= 50 %}var(--high){% elif summary.risk_score >= 25 %}var(--medium){% else %}var(--green){% endif %}">{{
+          summary.risk_score }}/100 {{ summary.risk_label }}</span>
+      </div>
+    </div>
+
+    <!-- OWASP Mapping -->
+    <div class="card">
+      <h2>🔗 OWASP Mobile Top 10 (2024) Mapping</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Category</th>
+            <th>Findings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in owasp_mapping %}
+          <tr>
+            <td><strong>{{ cat.code }}</strong></td>
+            <td>{{ cat.title }}</td>
+            <td class="{{ 'count-nonzero' if cat.finding_count > 0 else 'count-zero' }}">{{ cat.finding_count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- OWASP Category Navigation -->
+    <div class="owasp-nav">
+      {% for cat in owasp_mapping %}
+      {% if cat.finding_count > 0 %}
+      <a href="#{{ cat.code }}">{{ cat.code }}: {{ cat.title }} ({{ cat.finding_count }})</a>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Detailed Findings grouped by OWASP -->
     {% for cat in owasp_mapping %}
     {% if cat.finding_count > 0 %}
-    <a href="#{{ cat.code }}">{{ cat.code }}: {{ cat.title }} ({{ cat.finding_count }})</a>
-    {% endif %}
-    {% endfor %}
-  </div>
+    <div class="card" id="{{ cat.code }}">
+      <h2>{{ cat.code }} — {{ cat.title }}</h2>
+      <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:1rem">{{ cat.description }}</p>
 
-  <!-- Detailed Findings grouped by OWASP -->
-  {% for cat in owasp_mapping %}
-  {% if cat.finding_count > 0 %}
-  <div class="card" id="{{ cat.code }}">
-    <h2>{{ cat.code }} — {{ cat.title }}</h2>
-    <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:1rem">{{ cat.description }}</p>
+      {% for f in cat.findings %}
+      <div class="finding sev-{{ f.severity }}">
+        <div class="finding-header">
+          <span class="badge badge-{{ f.severity | lower }}">{{ f.severity }}</span>
+          <span class="finding-title">{{ f.title }}</span>
+          <span class="finding-id">{{ f.id }}</span>
+        </div>
+        <div class="finding-desc">{{ f.description }}</div>
 
-    {% for f in cat.findings %}
-    <div class="finding sev-{{ f.severity }}">
-      <div class="finding-header">
-        <span class="badge badge-{{ f.severity | lower }}">{{ f.severity }}</span>
-        <span class="finding-title">{{ f.title }}</span>
-        <span class="finding-id">{{ f.id }}</span>
-      </div>
-      <div class="finding-desc">{{ f.description }}</div>
+        {% for e in f.evidence %}
+        <div class="evidence-block">
+          <span class="evidence-file">{{ e.file }}</span>{% if e.line %} <span class="evidence-line">line {{ e.line
+            }}</span>{% endif %}
+          {% if e.snippet %}<br>{{ e.snippet }}{% endif %}
+        </div>
+        {% endfor %}
 
-      {% for e in f.evidence %}
-      <div class="evidence-block">
-        <span class="evidence-file">{{ e.file }}</span>{% if e.line %} <span class="evidence-line">line {{ e.line }}</span>{% endif %}
-        {% if e.snippet %}<br>{{ e.snippet }}{% endif %}
+        {% if f.remediation %}
+        <div class="remediation">{{ f.remediation }}</div>
+        {% endif %}
       </div>
       {% endfor %}
-
-      {% if f.remediation %}
-      <div class="remediation">{{ f.remediation }}</div>
-      {% endif %}
     </div>
+    {% endif %}
     {% endfor %}
-  </div>
-  {% endif %}
-  {% endfor %}
 
-  <div class="footer">
-    Generated by <strong>Kryptonite</strong> v{{ meta.version }} • {{ meta.scan_date[:10] }}<br>
-    Mapped to OWASP Mobile Top 10 (2024)
-  </div>
+    <div class="footer">
+      Generated by <strong>Kryptonite</strong> v{{ meta.version }} • {{ meta.scan_date[:10] }}<br>
+      Mapped to OWASP Mobile Top 10 (2024)
+    </div>
 
-</div>
+  </div>
 </body>
+
 </html>

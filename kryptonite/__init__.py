@@ -1,3 +1,3 @@
-"""Kryptonite — iOS IPA Static Analysis Security Tool."""
+"""Kryptonite — Mobile Static Analysis Security Tool (iOS + Android)."""
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"

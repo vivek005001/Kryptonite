@@ -32,10 +32,35 @@ _LOG_PATTERNS: list[tuple[str, str, re.Pattern[str], SeverityLevel, str]] = [
     (
         "LOG-003",
         "printf / fprintf Usage",
-        re.compile(r"\b(?:printf|fprintf|NSLog)\b"),
+        re.compile(r"\b(?:printf|fprintf)\b"),
         SeverityLevel.LOW,
         "C-level print functions may leak information. Remove or guard "
         "with preprocessor macros for release builds.",
+    ),
+    (
+        "LOG-007",
+        "Android Log.d/Log.v Usage",
+        re.compile(r"\bLog\.(?:d|v|i|e|w|wtf)\b"),
+        SeverityLevel.MEDIUM,
+        "Android Log.* calls write to logcat and can leak sensitive "
+        "information. Use Timber with a no-op tree in release builds, "
+        "or remove debug logging entirely.",
+    ),
+    (
+        "LOG-008",
+        "System.out / System.err Usage",
+        re.compile(r"\bSystem\.(?:out|err)\.print"),
+        SeverityLevel.LOW,
+        "System.out/err writes to logcat in Android. Remove or replace "
+        "with a proper logging framework.",
+    ),
+    (
+        "LOG-009",
+        "printStackTrace() Usage",
+        re.compile(r"\.printStackTrace\(\)"),
+        SeverityLevel.LOW,
+        "printStackTrace() exposes stack traces in logcat. Use a "
+        "proper logging framework with appropriate log levels.",
     ),
 ]
 

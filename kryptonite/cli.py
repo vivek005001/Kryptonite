@@ -1,4 +1,4 @@
-"""CLI entry point for Kryptonite iOS security scanner."""
+"""CLI entry point for Kryptonite mobile security scanner."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from pathlib import Path
 
 from kryptonite import __version__
 from kryptonite.core.ipa_parser import parse_ipa
+from kryptonite.core.apk_parser import parse_apk
 from kryptonite.analyzers import (
     secrets_analyzer,
     crypto_analyzer,
@@ -18,6 +19,14 @@ from kryptonite.analyzers import (
     data_storage_analyzer,
     url_scheme_analyzer,
     logging_analyzer,
+)
+from kryptonite.analyzers.android import (
+    manifest_analyzer as android_manifest_analyzer,
+    permissions_analyzer as android_permissions_analyzer,
+    binary_analyzer as android_binary_analyzer,
+    transport_analyzer as android_transport_analyzer,
+    data_storage_analyzer as android_data_storage_analyzer,
+    component_analyzer as android_component_analyzer,
 )
 from kryptonite.reports.report_generator import generate_json, generate_html
 
@@ -30,19 +39,34 @@ BANNER = r"""
  ║   ██╔═██╗ ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   ██║   ██║║
  ║   ██║  ██╗██║  ██║   ██║   ██║        ██║   ╚██████╔╝║
  ║   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝    ╚═════╝ ║
- ║        iOS Static Analysis Security Tool               ║
+ ║      Mobile Static Analysis Security Tool              ║
  ╚═══════════════════════════════════════════════════════╝
 """
 
-ALL_ANALYZERS = [
+# Analyzers that work on both platforms (they consume AppContext generically)
+_SHARED_ANALYZERS = [
     ("Hardcoded Secrets",      secrets_analyzer),
     ("Weak Cryptography",      crypto_analyzer),
+    ("Logging & Debug Code",   logging_analyzer),
+]
+
+# iOS-only analyzers
+_IOS_ANALYZERS = [
     ("Transport Security",     transport_analyzer),
     ("Permissions Audit",      permissions_analyzer),
     ("Binary Protections",     binary_analyzer),
     ("Data Storage",           data_storage_analyzer),
     ("URL Schemes",            url_scheme_analyzer),
-    ("Logging & Debug Code",   logging_analyzer),
+]
+
+# Android-only analyzers
+_ANDROID_ANALYZERS = [
+    ("Manifest Security",      android_manifest_analyzer),
+    ("Permissions Audit",      android_permissions_analyzer),
+    ("Binary Protections",     android_binary_analyzer),
+    ("Transport Security",     android_transport_analyzer),
+    ("Data Storage",           android_data_storage_analyzer),
+    ("Component Exposure",     android_component_analyzer),
 ]
 
 
@@ -59,32 +83,69 @@ def _error(msg: str) -> None:
     print(f"  ❌ {msg}", file=sys.stderr)
 
 
-def scan(ipa_path: str, output_dir: str, fmt: str) -> int:
+def _detect_platform(file_path: Path) -> str:
+    """Detect platform from file extension."""
+    ext = file_path.suffix.lower()
+    if ext == ".ipa":
+        return "ios"
+    if ext == ".apk":
+        return "android"
+    raise ValueError(
+        f"Unsupported file type: {ext}. Kryptonite supports .ipa and .apk files."
+    )
+
+
+def scan(file_path: str, output_dir: str, fmt: str) -> int:
     """Run the full scan pipeline. Returns exit code."""
     print(BANNER, file=sys.stderr)
 
-    ipa = Path(ipa_path)
+    fp = Path(file_path)
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    # ── Extract IPA ──────────────────────────────────────────────
-    _progress(f"Extracting {ipa.name}...")
+    # ── Detect platform ──────────────────────────────────────────
+    try:
+        platform = _detect_platform(fp)
+    except ValueError as exc:
+        _error(str(exc))
+        return 2
+
+    platform_label = "iOS" if platform == "ios" else "Android"
+    print(f"  📱 Platform detected: {platform_label}", file=sys.stderr)
+
+    # ── Extract app package ──────────────────────────────────────
+    _progress(f"Extracting {fp.name}...")
     start = time.time()
     try:
-        ctx = parse_ipa(ipa)
+        if platform == "ios":
+            ctx = parse_ipa(fp)
+        else:
+            ctx = parse_apk(fp)
     except Exception as exc:
-        _error(f"Failed to parse IPA: {exc}")
+        _error(f"Failed to parse {platform_label} package: {exc}")
         return 2
 
     elapsed = time.time() - start
     _done(f"Extracted {len(ctx.all_files)} files from {ctx.bundle_name} "
           f"({ctx.bundle_id}) in {elapsed:.1f}s")
-    _done(f"Binary: {ctx.binary_path.name if ctx.binary_path else 'not found'} "
-          f"| {len(ctx.binary_strings)} strings extracted")
+
+    if platform == "ios":
+        _done(f"Binary: {ctx.binary_path.name if ctx.binary_path else 'not found'} "
+              f"| {len(ctx.binary_strings)} strings extracted")
+    else:
+        _done(f"DEX files: {len(ctx.dex_files)} "
+              f"| Native libs: {len(ctx.native_libs)} "
+              f"| {len(ctx.binary_strings)} strings extracted")
+
+    # ── Select analyzers ─────────────────────────────────────────
+    if platform == "ios":
+        all_analyzers = _SHARED_ANALYZERS + _IOS_ANALYZERS
+    else:
+        all_analyzers = _SHARED_ANALYZERS + _ANDROID_ANALYZERS
 
     # ── Run analyzers ────────────────────────────────────────────
     all_findings = []
-    for name, analyzer in ALL_ANALYZERS:
+    for name, analyzer in all_analyzers:
         _progress(f"Running {name} analyzer...")
         try:
             results = analyzer.run(ctx)
@@ -94,14 +155,29 @@ def scan(ipa_path: str, output_dir: str, fmt: str) -> int:
             _error(f"{name} analyzer failed: {exc}")
 
     # ── App metadata ─────────────────────────────────────────────
-    app_info = {
-        "bundle_name": ctx.bundle_name,
-        "bundle_id": ctx.bundle_id,
-        "bundle_version": ctx.bundle_version,
-        "min_os_version": ctx.min_os_version,
-        "ipa_file": ipa.name,
-        "total_files": str(len(ctx.all_files)),
-    }
+    if platform == "ios":
+        app_info = {
+            "platform": "iOS",
+            "bundle_name": ctx.bundle_name,
+            "bundle_id": ctx.bundle_id,
+            "bundle_version": ctx.bundle_version,
+            "min_os_version": ctx.min_os_version,
+            "app_file": fp.name,
+            "total_files": str(len(ctx.all_files)),
+        }
+    else:
+        app_info = {
+            "platform": "Android",
+            "bundle_name": ctx.bundle_name,
+            "bundle_id": ctx.bundle_id,
+            "bundle_version": ctx.bundle_version,
+            "min_os_version": ctx.min_os_version,
+            "app_file": fp.name,
+            "total_files": str(len(ctx.all_files)),
+            "target_sdk": ctx.target_sdk_version,
+            "native_libs": str(len(ctx.native_libs)),
+            "dex_files": str(len(ctx.dex_files)),
+        }
 
     # ── Generate reports ─────────────────────────────────────────
     print("", file=sys.stderr)
@@ -144,15 +220,17 @@ def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(
         prog="kryptonite",
-        description="🛡️  Kryptonite — iOS IPA Static Analysis Security Tool",
+        description="🛡️  Kryptonite — Mobile Static Analysis Security Tool",
     )
     parser.add_argument(
         "--version", action="version", version=f"kryptonite {__version__}"
     )
     sub = parser.add_subparsers(dest="command")
 
-    scan_parser = sub.add_parser("scan", help="Scan an IPA file")
-    scan_parser.add_argument("ipa", help="Path to the .ipa file")
+    scan_parser = sub.add_parser("scan", help="Scan an IPA or APK file")
+    scan_parser.add_argument(
+        "file", help="Path to the .ipa or .apk file"
+    )
     scan_parser.add_argument(
         "--output-dir", "-o", default="./kryptonite-report",
         help="Output directory for reports (default: ./kryptonite-report)",
@@ -168,7 +246,7 @@ def main() -> None:
         parser.print_help()
         sys.exit(0)
 
-    code = scan(args.ipa, args.output_dir, args.format)
+    code = scan(args.file, args.output_dir, args.format)
     sys.exit(code)
 
 
