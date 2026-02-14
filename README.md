@@ -15,6 +15,7 @@ A powerful static analysis tool designed to identify security vulnerabilities in
 - **Multiple Output Formats**: Generate reports in JSON and HTML formats
 - **Fast & Efficient**: Optimized for quick analysis of large applications
 - **CLI Interface**: Simple command-line interface with flexible options
+- **Web Interface**: User-friendly web application for uploading and analyzing mobile apps
 - **Detailed Findings**: Rich security findings with severity levels and remediation guidance
 
 ## Security Analyzers
@@ -47,6 +48,7 @@ A powerful static analysis tool designed to identify security vulnerabilities in
 ### Prerequisites
 
 - Python 3.10 or higher
+- Node.js 18+ (for web interface)
 - For iOS analysis: Basic iOS development tools (optional)
 - For Android analysis: Basic Android SDK tools (optional)
 
@@ -57,6 +59,15 @@ git clone https://github.com/your-repo/kryptonite.git
 cd kryptonite
 pip install -r requirements.txt
 pip install -e .
+
+# Optional: Set up web interface
+cd kryptonite-web
+npm install
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install fastapi uvicorn python-multipart
+pip install -e ../..
 ```
 
 ### Install from PyPI (when available)
@@ -140,6 +151,52 @@ Interactive web-based report featuring:
 - Code snippets and remediation guidance
 - Responsive design for easy viewing
 
+## Web Interface
+
+Kryptonite includes a modern web application for easy mobile app analysis without command-line usage.
+
+### Features
+
+- **File Upload**: Drag-and-drop interface for APK and IPA files
+- **Real-time Analysis**: Live progress updates during scanning
+- **Interactive Reports**: Filterable findings with severity levels
+- **Risk Assessment**: Overall risk score and security recommendations
+- **Evidence Display**: Code snippets and file locations for each finding
+
+### Running the Web App
+
+1. **Install Dependencies**:
+
+   ```bash
+   cd kryptonite-web
+   npm install
+   ```
+
+2. **Start the Backend**:
+
+   ```bash
+   cd kryptonite-web/backend
+   source venv/bin/activate
+   uvicorn main:app --host 0.0.0.0 --port 8000
+   ```
+
+3. **Start the Frontend** (in a new terminal):
+
+   ```bash
+   cd kryptonite-web
+   npm run dev
+   ```
+
+4. **Access**: Open http://localhost:3000 in your browser
+
+### Web API
+
+The web interface uses a REST API for analysis:
+
+- **POST /analyze**: Upload and analyze a mobile app file
+  - Accepts: `multipart/form-data` with `file` field
+  - Returns: JSON report with findings and metadata
+
 ## Development
 
 ### Project Structure
@@ -179,6 +236,19 @@ kryptonite/
     ├── __init__.py
     ├── report_generator.py
     └── template.html
+kryptonite-web/
+├── backend/
+│   ├── main.py
+│   └── venv/
+├── src/
+│   └── app/
+│       ├── layout.tsx
+│       ├── page.tsx
+│       └── globals.css
+├── package.json
+├── tailwind.config.ts
+├── next.config.ts
+└── README.md
 tests/
 ├── __init__.py
 ├── conftest.py
