@@ -13,12 +13,15 @@ from kryptonite.core.apk_parser import parse_apk
 from kryptonite.analyzers import (
     secrets_analyzer,
     crypto_analyzer,
+    logging_analyzer,
+)
+
+from kryptonite.analyzers.ios import (
     transport_analyzer,
     permissions_analyzer,
     binary_analyzer,
     data_storage_analyzer,
     url_scheme_analyzer,
-    logging_analyzer,
 )
 from kryptonite.analyzers.android import (
     manifest_analyzer as android_manifest_analyzer,
@@ -32,15 +35,15 @@ from kryptonite.reports.report_generator import generate_json, generate_html
 
 
 BANNER = r"""
- ╔═══════════════════════════════════════════════════════╗
- ║   ██╗  ██╗██████╗ ██╗   ██╗██████╗ ████████╗ ██████╗ ║
- ║   ██║ ██╔╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝██╔═══██╗║
- ║   █████╔╝ ██████╔╝ ╚████╔╝ ██████╔╝   ██║   ██║   ██║║
- ║   ██╔═██╗ ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   ██║   ██║║
- ║   ██║  ██╗██║  ██║   ██║   ██║        ██║   ╚██████╔╝║
- ║   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝    ╚═════╝ ║
- ║      Mobile Static Analysis Security Tool              ║
- ╚═══════════════════════════════════════════════════════╝
+ ╔══════════════════════════════════════════════════════════════════════════════╗
+ ║  ██╗  ██╗██████╗ ██╗   ██╗██████╗ ████████╗ ██████╗ ███╗   ██╗██╗████████╗███████╗ ║
+ ║  ██║ ██╔╝██╔══██╗╚██╗ ██╔╝██╔══██╗╚══██╔══╝██╔═══██╗████╗  ██║██║╚══██╔══╝██╔════╝ ║
+ ║  █████╔╝ ██████╔╝ ╚████╔╝ ██████╔╝   ██║   ██║   ██║██╔██╗ ██║██║   ██║   █████╗   ║
+ ║  ██╔═██╗ ██╔══██╗  ╚██╔╝  ██╔═══╝    ██║   ██║   ██║██║╚██╗██║██║   ██║   ██╔══╝   ║
+ ║  ██║  ██╗██║  ██║   ██║   ██║        ██║   ╚██████╔╝██║ ╚████║██║   ██║   ███████╗ ║
+ ║  ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝        ╚═╝    ╚═════╝ ╚═╝  ╚═══╝╚═╝   ╚═╝   ╚══════╝ ║
+ ║                       Mobile Static Analysis Security Tool                           ║
+ ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
 # Analyzers that work on both platforms (they consume AppContext generically)

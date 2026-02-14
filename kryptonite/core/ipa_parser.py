@@ -76,6 +76,7 @@ class AppContext:
             ".css", ".txt", ".cfg", ".conf", ".yml", ".yaml", ".md",
             ".swift", ".m", ".h", ".c", ".cpp", ".storyboard", ".xib",
             ".properties", ".gradle", ".pro", ".kt", ".java", ".smali",
+            ".py", ".rb", ".php", ".asp", ".jsp",
         }
         return [f for f in self.all_files if f.suffix.lower() in text_exts]
 
