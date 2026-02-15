@@ -18,13 +18,3 @@ import time
 
 while True:
     time.sleep(10)
-
-with open('tunnel_url.txt', 'w') as f:
-    f.write(tunnel.public_url)
-
-print(tunnel.public_url)
-
-import time
-
-while True:
-    time.sleep(10)
