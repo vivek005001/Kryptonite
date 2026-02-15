@@ -1,0 +1,155 @@
+\documentclass{beamer}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+
+% Custom Colors
+\definecolor{KryptoniteBlue}{RGB}{0, 102, 204}
+\definecolor{KryptoniteRed}{RGB}{204, 0, 0}
+\setbeamercolor{palette primary}{bg=KryptoniteBlue,fg=white}
+\setbeamercolor{palette secondary}{bg=KryptoniteBlue,fg=white}
+\setbeamercolor{palette tertiary}{bg=KryptoniteBlue,fg=white}
+\setbeamercolor{palette quaternary}{bg=KryptoniteBlue,fg=white}
+\setbeamercolor{structure}{fg=KryptoniteBlue}
+
+\title[Kryptonite]{Kryptonite: Mobile Security Analysis Tool}
+\subtitle{Mid-Term Project Submission}
+\author[Team Sentinel]{Team Sentinel}
+\date{\today}
+
+\begin{document}
+
+% ---------------------------------------------------
+% Title Slide
+% ---------------------------------------------------
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---------------------------------------------------
+% Team Members
+% ---------------------------------------------------
+\begin{frame}{Team Sentinel}
+  \begin{columns}
+    \column{0.6\textwidth}
+    \textbf{Team Name:} Sentinel
+    
+    \vspace{0.5cm}
+    \textbf{Team Members:}
+    \begin{itemize}
+      \item Vivek (Lead Developer)
+      \item [Another Member]
+      \item [Another Member]
+    \end{itemize}
+    
+    \column{0.4\textwidth}
+     \begin{center}
+      % Dashboard Mockup
+      \includegraphics[width=0.9\textwidth]{kryptonite_dashboard_mockup_1771051743362.png}
+     \end{center}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------
+% Problem Statement (PS)
+% ---------------------------------------------------
+\begin{frame}{Problem Statement}
+  \textbf{Selected PS:} Automated Mobile Security Vulnerability Assessment
+  
+  \vspace{0.5cm}
+  
+  \textbf{Why this problem?}
+  \begin{itemize}
+    \item Mobile ecosystem (iOS/Android) handles critical user data.
+    \item Manual penetration testing is slow and requires specialized skills.
+    \item Developers often overlook security best practices (hardcoded keys, weak crypto).
+    \item Need for a unified tool to scan both IPA and APK files.
+  \end{itemize}
+  
+  \vspace{0.5cm}
+  \textbf{Goal:} "Kryptonite" — A seamless CLI tool to automate static analysis and detect vulnerabilities early in the dev cycle.
+\end{frame}
+
+% ---------------------------------------------------
+% Approach
+% ---------------------------------------------------
+\begin{frame}{Our Approach: Modular Architecture}
+  \begin{center}
+    % Architecture Mindmap
+    \includegraphics[width=0.85\textwidth]{kryptonite_architecture_mindmap_1771051712399.png}
+  \end{center}
+  
+  \vspace{0.2cm}
+  \textbf{Key Components:}
+  \begin{enumerate}
+    \item \textbf{Platform-Agnostic Core:} Normalized `AppContext` for unified data handling.
+    \item \textbf{Specialized Parsers:} `apk_parser` (using struct unpacking) and `ipa_parser` (zip/plist).
+    \item \textbf{Extensible Analyzers:} Easy-to-add python modules for new checks.
+  \end{enumerate}
+\end{frame}
+
+% ---------------------------------------------------
+% Technical Architecture (Workflow)
+% ---------------------------------------------------
+\begin{frame}{Analysis Workflow}
+ \begin{center}
+    % Workflow Diagram
+    \includegraphics[width=0.85\textwidth]{kryptonite_workflow_diagram_1771051728636.png}
+ \end{center}
+ 
+ \begin{itemize}
+     \item \textbf{Auto-Detection:} Automatically determines file type (IPA vs APK).
+     \item \textbf{Static Analysis:} Safe analysis without running malicious code.
+     \item \textbf{Reporting:} Generates HTML for humans and JSON for CI integration.
+ \end{itemize}
+\end{frame}
+
+
+% ---------------------------------------------------
+% Current Status
+% ---------------------------------------------------
+\begin{frame}{Mid-Term Progress Report}
+  We have achieved full basic functionality for both platforms.
+  
+  \vspace{0.3cm}
+  
+  \begin{block}{Completed Features}
+  \begin{itemize}
+    \item \textbf{CLI Engine:} Fully functional with flexible arguments.
+    \item \textbf{iOS Analysis:} Transport Security, Permissions, Plist checks.
+    \item \textbf{Android Analysis:} Manifest parsing, DEX string extraction, Component export checks.
+    \item \textbf{Unified Reporting:} Beautiful HTML reports with risk scoring.
+  \end{itemize}
+  \end{block}
+
+  \begin{block}{Validation}
+  \begin{itemize}
+    \item Verified against OWASP Mobile Top 10 benchmarks (InsecureBank, DIVA).
+    \item Unit tests for synthetic malicious apps pass (Exit code 0).
+  \end{itemize}
+  \end{block}
+\end{frame}
+
+% ---------------------------------------------------
+% Future Roadmap
+% ---------------------------------------------------
+\begin{frame}{Future Roadmap}
+  \begin{itemize}
+    \item \textbf{Phase 3 (Next):} Deeper binary analysis (using r2/ghidra bindings).
+    \item \textbf{Phase 4:} Code reconstruction (decompilation to Java/Swift).
+    \item \textbf{Phase 5:} Plugin system for 3rd party rules.
+  \end{itemize}
+  
+  \vspace{1cm}
+  \centering
+  \Large \textbf{Thank You}
+  
+  \vspace{0.2cm}
+  \small Team Sentinel
+\end{frame}
+
+
+\end{document}
