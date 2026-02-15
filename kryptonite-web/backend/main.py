@@ -36,7 +36,7 @@ async def analyze_file(file: UploadFile = File(...)):
 
         try:
             # Get full path to kryptonite executable
-            kryptonite_path = os.path.join(os.path.dirname(__file__), "venv", "bin", "kryptonite")
+            kryptonite_path = os.path.join("kryptonite")
             
             # Run kryptonite scan
             result = subprocess.run(
